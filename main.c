@@ -77,19 +77,27 @@ int run(VM* vm){
         case NOP: break;    // pass
         case DCONST_M1:     // push -1.0 onto stack
             // TODO: implement this.
+	    PUSH(vm, -1.0)
             break;
         case DCONST_0:      // push 0.0 onto stack
             // TODO: implement this.
+	    PUSH(vm, 0.0)
             break;
         case DCONST_1:      // push 1.0 onto stack
             // TODO: implement this.
+	    PUSH(vm, 1.0)
             break;
         case DCONST_2:      // push 2.0 onto stack
             // TODO: implement this.
+	    PUSH(vm, 2.0)
             break;
         case DCONST:        // reads next 8 bytes of opcode as a double, and stores it on the stack.
             // TODO: implement this.
             // HINT: use memcpy to read next 8 bytes of code as a double. make sure you consider endianness.
+	    int *value;
+	    memcpy((void *) value, (void *) opcode, sizeof(char) * 8);
+	    a = (double)(*value);
+	    PUSH(vm, a);
             break;
         case ADD:           // add two doubles from top of stack and push result back onto stack
             b = POP(vm);
@@ -98,33 +106,54 @@ int run(VM* vm){
             break;
         case MUL:           // multiply two doubles from top of stack and push result back onto stack
             // TODO: implement this.
+	    b = POP(vm);
+	    a = POP(vm);
+	    PUSH(vm, a * b);
             break;
         case SUB:           // subtract two doubles from top of stack and push result back onto stack
             // TODO: implement this.
+	    b = POP(vm);
+	    a = POP(vm);
+	    PUSH(vm, a - b);
             break;
         case DIV:          // divide two doubles from top of stack and push result back onto stack
             //TODO: implement this.
             // HINT: make sure to deal with the division by zero case.
+	    b = POP(vm);
+	    if (b == 0){
+		    fprintf(stderr, "Division by zero is impermissible!");
+		    return EXIT_FAILURE;
+	    }
+	    a = POP(vm);
+	    PUSH(vm, a / b);
             break;
         case NEG:                         // negates top of stack
             //TODO: implement this.
+	    a = POP(vm);
+	    PUSH(vm, -a);
             break;
         case LD1:          // put value from r1 on top of stack
             // TODO: implement this.
+	    PUSH(vm, vm->r1);
             break;
         case ST1:                         // store top of stack in r1
             // TODO: implement this.
+	    vm->r1 = POP(vm);
             break;
         case LD2:           // put value from r2 on top of stack
             // TODO: implement this.
             // HINT: should be similar to LD1.
+	    PUSH(vm, vm->r2);
             break;
         case ST2:                         // store top of stack in r2
             // TODO: implement this.
             // HINT: should be similar to ST1.
+	    vm->r2 = POP(vm, vm->r2);
             break;
         case PRINT:                       // print top of stack, (and discard value afterwards.)
             // TODO: implement this.
+	    a = POP(vm);
+	    printf("%.2f\n", a);
             break;
         default:
             printf("InvalidOpcodeError: %x\n", opcode);  // terminate program at unknown opcode and show error.
